@@ -1,0 +1,139 @@
+<!-- dashboard.html -->
+{% extends "product/base.html" %}
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<style>
+
+.content-section h1{
+
+    color:aliceblue;
+
+
+}
+  .content-section p{
+
+    color:red;
+  }
+  table{
+
+
+    padding:400px;
+  }
+  .cart-header {
+    margin: 20px 0;
+}
+
+.cart-table th,
+.cart-table td {
+    vertical-align: middle;
+}
+
+.cart-table .quantity-input {
+    width: 60px;
+    text-align: center;
+}
+
+.total-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.checkout-btn {
+    margin-top: 20px;
+}
+
+.empty-cart {
+    text-align: center;
+    margin-top: 50px;
+}
+h2,td, th{
+
+    color:white;
+}
+    </style>
+{% block content %}
+<div style='margin-left:140px;' class="dashboard-container">
+    <h1 style="color:white;">Dashboard</h1>
+    <div style="color:white;" class="welcome-message">Welcome to your dashboard!</div>
+    <div style="color:white;" class="user-greeting">Hello, {{ request.user.username }}!</div>
+
+    <div class="content-section">
+        <h2 style="color:white;">Your Account Information</h2>
+        <p style="color:blue"> <strong>Registration Date:</strong> {{ request.user.date_joined|date:"F d, Y" }}</p>
+    </div>
+<!--
+    <div class="content-section">
+        <h2 style="color:white;">Your Recent Activity</h2>
+        <ul>
+            <li style="color: greenyellow;">Viewed the latest product catalog</li>
+            <li style="color: greenyellow;">Updated profile information</li>
+            <li style="color: greenyellow;">Participated in the community forum</li>
+        </ul>
+    </div>
+   -->
+
+    <div class="content-section">
+        {% if   users.role == 'farmer' %}
+        <h style='color:white;font-size:18px;'><i>Farmer Services history</i></h>
+
+        {% for   farmers in   farmers_order%}
+<table class="table">
+
+    <tr style='color:white;'>
+
+      <th>Name</th>
+      <th>Decription</th>
+      <th>Date requested</th>
+      <th >Status</th>
+
+    </tr>
+<tr>
+    <td style="color:blue">{{ farmers.name }}</td>
+
+        <td style="color:blue">{{ farmers.description }}</td>
+        <td style="color:blue">{{ farmers.created_at|date:"F d, Y" }}</td>
+        <td style="color:blue;color:green;">{{ farmers.Approval }}</td>
+<tr>
+{% endfor %}  
+</table>
+
+{% endif %}
+  
+        </div>
+
+
+
+             
+    
+        <div style='margin-top:60px;' class="content-section">
+            <h style='color:white;font-size:18px;'><i>Products history</i></h>
+    
+            {% for   product in   product_order %}
+    <table class="table">
+    
+        <tr style='color:white;'>
+    
+          <th>Name</th>
+          <th>Total</th>
+          <th>Date </th>
+          <th >quantity</th>
+    
+        </tr>
+    <tr>
+        <td style="color:blue">{{ product.product.name}}</td>
+    
+            <td style="color:blue">{{ product.total }}</td>
+            <td style="color:blue">{{ product.created_at|date:"F d, Y" }}</td>
+            <td style="color:blue;color:yellow;">{{ product.quantity }}</td>
+    </tr>
+    {% endfor %}  
+    </table>
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+            </div>
+
+</div>
+{% endblock %}

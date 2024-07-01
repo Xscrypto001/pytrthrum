@@ -1,0 +1,73 @@
+{% extends "product/base.html" %}
+{% block content %}
+{% load static %}
+
+
+
+    <title>Checkout</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .cart-header {
+            margin: 20px 0;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            vertical-align: middle;
+        }
+
+        .cart-table .quantity-input {
+            width: 60px;
+            text-align: center;
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .checkout-btn {
+            margin-top: 20px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            margin-top: 50px;
+        }
+       h2,td, th{
+
+            color:white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Checkout</h2>
+        <form method="post" action="{% url 'process_checkout' %}">
+            {% csrf_token %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>Ksh. {{ item.product.price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success">Checkout</button>
+        </form>
+    </div>
+    
+
+{% endblock %}

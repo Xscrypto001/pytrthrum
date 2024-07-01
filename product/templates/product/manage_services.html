@@ -1,0 +1,159 @@
+{% extends "product/base.html" %}
+{% block content %}
+{% load static %}
+
+    <title>Manage Services</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+        td,th{
+
+            color:white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 style='color:white;' class="mb-4">Manage Services</h2>
+
+        <button class="btn btn-primary mb-4" data-toggle="modal" data-target="#addServiceModal">
+            <i class="fas fa-plus"></i> Add Service
+        </button>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Farmer</th>
+                    <th>Service Name</th>
+                    <th>Description</th>
+                    <th>Approval</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.farmer.username }}</td>
+                    <td>{{ order.name }}</td>
+                    <td>{{ order.description }}</td>
+                    <td>{{ order.Approval }}</td>
+                    <td>
+                        <a href="{% url 'approve_order_service' order.id %}" class="btn btn-success btn-sm">Approve</a>
+                        <a href="{% url 'decline_order_service' order.id %}" class="btn btn-danger btn-sm">Decline</a>
+                    </td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Add Service Modal -->
+    <div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addServiceModalLabel">Add New Service</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addServiceForm">
+                        <div class="form-group">
+                            <label for="serviceName">Service Name</label>
+                            <input type="text" class="form-control" id="serviceName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceDescription">Service Description</label>
+                            <textarea class="form-control" id="serviceDescription" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Service</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle Add Service Form
+            $('#addServiceForm').submit(function(e) {
+                e.preventDefault();
+                var name = $('#serviceName').val();
+                var description = $('#serviceDescription').val();
+
+                $.ajax({
+                    url: '{% url "add_service" %}',
+                    type: 'POST',
+                    data: {
+                        name: name,
+                        description: description,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        alert('Service added successfully!');
+                        $('#addServiceForm')[0].reset();
+                        $('#addServiceModal').modal('hide');
+                        location.reload(); // Reload the page to reflect the new service
+                    },
+                    error: function(response) {
+                        alert('Error adding service.');
+                    }
+                });
+            });
+
+            // Handle Approve Service
+            $('.approve-btn').click(function() {
+                var serviceId = $(this).data('service-id');
+                $.ajax({
+                    url: '{% url "approve_service" %}',
+                    type: 'POST',
+                    data: {
+                        service_id: serviceId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        alert('Service approved successfully!');
+                        location.reload(); // Reload the page to reflect the approval
+                    },
+                    error: function(response) {
+                        alert('Error approving service.');
+                    }
+                });
+            });
+
+            // Handle Delete Service
+            $('.delete-btn').click(function() {
+                var serviceId = $(this).data('service-id');
+                $.ajax({
+                    url: '{% url "delete_service" %}',
+                    type: 'POST',
+                    data: {
+                        service_id: serviceId,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        alert('Service deleted successfully!');
+                        location.reload(); // Reload the page to reflect the deletion
+                    },
+                    error: function(response) {
+                        alert('Error deleting service.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+{% endblock %}

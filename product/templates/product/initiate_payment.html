@@ -1,0 +1,121 @@
+{% extends "product/base.html" %}
+{% block content %}
+{% load static %}
+
+
+
+    <title>Checkout</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .cart-header {
+            margin: 20px 0;
+        }
+
+        .cart-table th,
+        .cart-table td {
+            vertical-align: middle;
+        }
+
+        .cart-table .quantity-input {
+            width: 60px;
+            text-align: center;
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .checkout-btn {
+            margin-top: 20px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            margin-top: 50px;
+        }
+       h2,td, th{
+
+            color:white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Checkout</h2>
+        <form >
+  <label for='phone'>Kindly enter your mpesa number<label>
+     <input id='phone_number' type='number'>
+        </form>
+        <form method="post" action="{% url 'process_checkout' %}">
+            {% csrf_token %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td id ='amount'>Ksh. {{ item.product.price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="button" type="submit"  class="btn btn-primary" onclick="initiatePayment()">Checkout</button>
+
+        </form>
+    </div>
+    
+
+
+    <!-- Include Paystack script with your public key -->
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    // Function to initiate payment
+    function initiatePayment() {
+        var amount = document.getElementById('amount').value; // Get amount from input field
+        var email = 'ikinyapeter93@gmail.com'; // Get email from input field
+        var phone_number = document.getElementById('phone_number').value; // Get phone number from input field
+        
+        // Initialize Paystack Inline
+        var handler = PaystackPop.setup({
+            key: 'pk_live_504e9f8c8aebfa975ff87ba801235867f91f39f9', // Replace with your actual public key from Paystack
+            email: email,
+            amount: amount * 100, // Amount in kobo (100 kobo = 1 KES for KES currency)
+            currency: 'KES', // Change currency as needed (e.g., KES for Kenyan Shilling)
+            ref: 'PAYSTACK' + Math.floor((Math.random() * 1000000000) + 1), // Unique reference
+            metadata: {
+                custom_fields: [
+                    {
+                        display_name: "Phone Number",
+                        variable_name: "phone_number",
+                        value: phone_number
+                    }
+                ]
+            },
+            callback: function(response) {
+                // Redirect or handle success scenario
+                console.log(response);
+                // Redirect to process_checkout view
+                window.location.href = "{% url 'process_checkout' %}?reference=" + response.reference;
+            },
+            onClose: function() {
+                alert('Payment window closed without completing payment.');
+            }
+        });
+        handler.openIframe(); // Open Paystack payment iframe
+    }
+</script>
+
+</div>
+
+
+{% endblock %}
